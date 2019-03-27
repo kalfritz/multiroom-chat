@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+const moment = require('moment');
+moment.locale('en');
 
 const volleyball = require('volleyball');
 const cors = require(`cors`);
@@ -11,7 +13,7 @@ const cors = require(`cors`);
 app.use(volleyball);
 app.use(
   cors({
-    origin: 'http://localhost:8080',
+    origin: 'http://localhost:8081',
   }),
 );
 app.use(express.json());
@@ -28,10 +30,10 @@ app.post('/login', (req, res) => {
   io.emit('msgParaCliente', {
     user: req.body.user,
     message: ' acabou de entrar no chat.',
-    date: Date.now(),
+    date: moment().format('LT'),
   });
   res.json({
-    message: 'ok',
+    user: req.body.user,
   });
 });
 
@@ -47,8 +49,7 @@ server.listen(port, () => {
 io.on('connection', socket => {
   console.log('Usuário ', socket.id, ' conectado.');
   socket.on('SEND_MESSAGE', data => {
-
-    data.date = Date.now();
+    data.date = moment().format('LT');
 
     io.emit('MESSAGE', data);
   });

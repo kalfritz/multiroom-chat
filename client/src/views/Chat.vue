@@ -3,14 +3,15 @@
     <div class="card-body">
       <div class="card-title">
         <h3>Chat Group</h3>
+        Olá {{user}}
         <hr>
       </div>
       <div class="card-body message-chat">
         <div class="messages" v-for="(msg, index) in messages" :key="index">
           <p>
-            <span>{{msg.date}}</span>
-            <span v-if="!warning" class="font-weight-bold">{{ msg.user }}:</span>
-            {{ msg.message }}
+            <span class="date mx-1">{{msg.date}}</span>
+            <span class="user font-weight-bold mx-2" v-if="!warning">{{ msg.user }}:</span>
+            <span class="message">{{ msg.message }}</span>
           </p>
         </div>
       </div>
@@ -39,16 +40,21 @@ import io from 'socket.io-client';
 export default {
   data: () => ({
     warning: false,
-    user: '',
+    //  user: '',
     message: '',
     messages: [],
     socket: io('localhost:5990'),
   }),
+  computed: {
+    user() {
+      return this.$route.params.user;
+    },
+  },
   methods: {
     sendMessage(e) {
       e.preventDefault();
       this.socket.emit('SEND_MESSAGE', {
-        
+        user: this.user,
         message: this.message,
       });
       this.message = '';
@@ -63,12 +69,13 @@ export default {
     });
     this.socket.on('msgParaCliente', data => {
       this.warning = true;
-      console.log(data.user);
+      console.log('a', data.user);
       let infoMsg = {
         message: data.user + data.message,
         date: data.date,
       };
-      console.log(infoMsg.message);
+      //  console.log(infoMsg);
+      //    console.log(infoMsg.date);
       this.messages = [...this.messages, infoMsg];
     });
   },

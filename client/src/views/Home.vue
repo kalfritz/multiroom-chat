@@ -46,8 +46,11 @@ export default {
       })
         .then(response => response.json())
         .then(res => {
+          this.$router.push({
+            name: 'chat',
+            params: { user: this.user.username },
+          });
           this.user.username = '';
-          this.$router.push('/chat');
         });
     },
   },
